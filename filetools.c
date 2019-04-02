@@ -23,17 +23,17 @@ int chmd() {
         case 0:
             chmod("file1", S_IRWXU);
             break;
-// Mode flag: Read, write, execute by user.
-//依据上面数字的提示定义其他case中文件权限的情况。
-//补充代码：case1
+            // Mode flag: Read, write, execute by user.
+            //依据上面数字的提示定义其他case中文件权限的情况。
+            //补充代码：case1
         case 1:
             chmod("file1", S_IRUSR);
             break;
-//补充代码：case2
+            //补充代码：case2
         case 2:
             chmod("file1", S_IWUSR);
             break;
-//补充代码：case3
+            //补充代码：case3
         case 3:
             chmod("file1", S_IXUSR);
             break;
@@ -44,9 +44,10 @@ int chmd() {
 }
 
 int main() {
-    int fd;
+    int fd = -1;
     int num;
     int choice;
+    ssize_t ret;
     char buffer[MAX];
     struct stat st;
     char *path = "/bin/ls";
@@ -69,12 +70,15 @@ int main() {
                 exit(0);
             case 1:
                 fd = open("file1", O_RDWR | O_TRUNC | O_CREAT, 0750);
-/*
-O_RDWR : file open mode: Read/Write
-O_TRUNC : file open mode: Truncate file to length 0
-O_CREAT : file open mode: Create if file does not yet exist.
-0750: file access permission bits -rwxr-x---当前用户rwx；同组用户r-x； 其他用户无权限
-*/
+
+//                fd=open("file1.txt",O_WRONLY | O_CREAT | O_TRUNC,0600);
+
+                /*
+                O_RDWR : file open mode: Read/Write
+                O_TRUNC : file open mode: Truncate file to length 0
+                O_CREAT : file open mode: Create if file does not yet exist.
+                0750: file access permission bits -rwxr-x---当前用户rwx；同组用户r-x； 其他用户无权限
+                */
 
                 if (fd == -1)
                     printf("File Create Failed!\n");
@@ -83,14 +87,25 @@ O_CREAT : file open mode: Create if file does not yet exist.
                 break;
             case 2:
                 //补充代码：用read与write函数，从键盘里面读取信息，写到filel里面
-                printf("please input:\n");
-                scanf("%s", buffer);
-                write(fd, buffer, strlen(buffer));
+                // read() 成功则返回读取的字节数ret，出错返回-1并设置errno，如果在调read之前已到达文件末尾，则这次read返回0，出错返回-1
+                ret = read(STDIN_FILENO, buffer, MAX);
+
+                if (ret >= 0) {
+                    // 将buffer中字符写进fd中
+                    write(fd, buffer, strlen(buffer));
+                    // 手动将指针归位!
+                    lseek(fd, -ret, SEEK_CUR);
+                }
                 break;
             case 3:
                 //补充代码：用read与write函数，把file1文件的内容在屏幕上输出
-                read(fd, buffer, strlen(buffer));
-                printf("The file is:\n==============\n%s\n==============", buffer);
+
+                // 从文件指针fd中读入数据到buffer中
+                ret = read(fd, buffer, MAX);
+
+                // 将buffer中字符写到标准输出，长度为ret
+                if (ret >= 0)
+                    write(STDOUT_FILENO, buffer, strlen(buffer));
                 break;
             case 4:
                 chmd();
