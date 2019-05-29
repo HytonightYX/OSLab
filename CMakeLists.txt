@@ -10,7 +10,8 @@ add_executable(exp3-systemV-1 exp3/SystemV-1.c)
 add_executable(exp3-systemV-2 exp3/SystemV-2.c)
 add_executable(exp3-POSIX-P exp3/POSIX-Producer.c)
 add_executable(exp3-POSIX-C exp3/POSIX-Consumer.c)
-
+add_executable(RW_Problem exp6/RW_Problem.c)
+add_executable(BankerAlgorithm exp7/BankerAlgorithm.c)
 
 add_executable(exp4-test1 exp4/Thread1.c)
 add_executable(exp4-test2 exp4/Thread2.c)
